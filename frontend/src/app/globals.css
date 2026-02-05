@@ -1,0 +1,237 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-secondary-50 text-secondary-800 antialiased;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-secondary-100 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-secondary-300 rounded-full hover:bg-secondary-400 transition-colors;
+  }
+}
+
+@layer components {
+  /* Button styles */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 shadow-soft hover:shadow-soft-lg;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-secondary-100 text-secondary-700 hover:bg-secondary-200 focus:ring-secondary-400;
+  }
+  
+  .btn-outline {
+    @apply btn border-2 border-primary-500 text-primary-600 hover:bg-primary-50 focus:ring-primary-500;
+  }
+  
+  .btn-ghost {
+    @apply btn text-secondary-600 hover:bg-secondary-100 focus:ring-secondary-400;
+  }
+  
+  .btn-danger {
+    @apply btn bg-error text-white hover:bg-red-600 focus:ring-red-500;
+  }
+  
+  .btn-icon {
+    @apply p-2 rounded-xl text-secondary-500 hover:bg-secondary-100 transition-colors;
+  }
+  
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm rounded-lg;
+  }
+  
+  .btn-lg {
+    @apply px-6 py-3 text-lg rounded-2xl;
+  }
+  
+  /* Input styles */
+  .input {
+    @apply w-full px-4 py-2.5 rounded-xl border border-secondary-200 bg-white text-secondary-800 placeholder-secondary-400 transition-all duration-200 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100;
+  }
+  
+  .input-error {
+    @apply border-error focus:border-error focus:ring-red-100;
+  }
+  
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-2xl shadow-soft p-6;
+  }
+  
+  .card-hover {
+    @apply card hover:shadow-soft-lg transition-shadow duration-200;
+  }
+  
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply badge bg-primary-100 text-primary-700;
+  }
+  
+  .badge-success {
+    @apply badge bg-green-100 text-green-700;
+  }
+  
+  .badge-warning {
+    @apply badge bg-amber-100 text-amber-700;
+  }
+  
+  .badge-error {
+    @apply badge bg-red-100 text-red-700;
+  }
+  
+  /* Avatar */
+  .avatar {
+    @apply rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-medium;
+  }
+  
+  .avatar-sm {
+    @apply w-8 h-8 text-sm;
+  }
+  
+  .avatar-md {
+    @apply w-10 h-10 text-base;
+  }
+  
+  .avatar-lg {
+    @apply w-12 h-12 text-lg;
+  }
+  
+  /* Sidebar */
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-secondary-600 hover:bg-secondary-100 hover:text-secondary-900 transition-all duration-200;
+  }
+  
+  .sidebar-item-active {
+    @apply sidebar-item bg-primary-50 text-primary-600 hover:bg-primary-100;
+  }
+  
+  /* Modal overlay */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50;
+  }
+  
+  /* Tiptap Editor styles */
+  .ProseMirror {
+    @apply outline-none min-h-[200px];
+  }
+  
+  .ProseMirror h1 {
+    @apply text-2xl font-bold mb-4;
+  }
+  
+  .ProseMirror h2 {
+    @apply text-xl font-semibold mb-3;
+  }
+  
+  .ProseMirror h3 {
+    @apply text-lg font-medium mb-2;
+  }
+  
+  .ProseMirror p {
+    @apply mb-2;
+  }
+  
+  .ProseMirror ul, .ProseMirror ol {
+    @apply ml-4 mb-2;
+  }
+  
+  .ProseMirror ul {
+    @apply list-disc;
+  }
+  
+  .ProseMirror ol {
+    @apply list-decimal;
+  }
+  
+  .ProseMirror blockquote {
+    @apply border-l-4 border-primary-300 pl-4 italic text-secondary-600;
+  }
+  
+  .ProseMirror code {
+    @apply bg-secondary-100 px-1.5 py-0.5 rounded text-sm font-mono;
+  }
+  
+  .ProseMirror pre {
+    @apply bg-secondary-900 text-secondary-100 p-4 rounded-xl mb-4 overflow-x-auto;
+  }
+  
+  .ProseMirror a {
+    @apply text-primary-500 underline;
+  }
+  
+  .ProseMirror img {
+    @apply rounded-xl max-w-full;
+  }
+  
+  .ProseMirror p.is-editor-empty:first-child::before {
+    @apply text-secondary-400 float-left h-0 pointer-events-none;
+    content: attr(data-placeholder);
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-primary-700;
+  }
+  
+  .glass {
+    @apply bg-white/80 backdrop-blur-lg;
+  }
+  
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Dark mode */
+.dark body {
+  @apply bg-secondary-900 text-secondary-100;
+}
+
+.dark .card {
+  @apply bg-secondary-800 border border-secondary-700;
+}
+
+.dark .input {
+  @apply bg-secondary-800 border-secondary-600 text-secondary-100;
+}
+
+.dark .sidebar-item {
+  @apply text-secondary-300 hover:bg-secondary-800 hover:text-secondary-100;
+}
+
+.dark .sidebar-item-active {
+  @apply bg-primary-900/50 text-primary-400;
+}

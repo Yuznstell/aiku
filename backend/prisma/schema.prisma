@@ -1,0 +1,285 @@
+// Prisma Schema for AIKU - Productivity & Collaboration Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ ENUMS ============
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  BLOCKED
+}
+
+enum SharePermission {
+  VIEWER
+  EDITOR
+  OWNER
+}
+
+enum RepeatType {
+  NONE
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum TaskStatus {
+  TODO
+  DOING
+  DONE
+}
+
+// ============ MODELS ============
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  name          String
+  avatar        String?
+  role          Role     @default(USER)
+  isOnline      Boolean  @default(false)
+  emailVerified Boolean  @default(false)
+  lastSeen      DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  notes              Note[]
+  reminders          Reminder[]
+  calendarEvents     CalendarEvent[]
+  noteShares         NoteShare[]
+  eventShares        EventShare[]
+  reminderShares     ReminderShare[]
+  sentMessages       Message[]        @relation("SentMessages")
+  receivedMessages   Message[]        @relation("ReceivedMessages")
+  sentRequests       Friendship[]     @relation("Requester")
+  receivedRequests   Friendship[]     @relation("Addressee")
+  activityLogs       ActivityLog[]
+  refreshTokens      RefreshToken[]
+  tasks              Task[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  title     String
+  content   String   @db.Text
+  isShared  Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tags       NoteTag[]
+  shares     NoteShare[]
+  images     NoteImage[]
+
+  @@map("notes")
+}
+
+model NoteTag {
+  id     String @id @default(uuid())
+  name   String
+  noteId String
+  note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@map("note_tags")
+}
+
+model NoteImage {
+  id       String @id @default(uuid())
+  url      String
+  publicId String
+  noteId   String
+  note     Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@map("note_images")
+}
+
+model NoteShare {
+  id         String          @id @default(uuid())
+  noteId     String
+  note       Note            @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission SharePermission @default(VIEWER)
+  createdAt  DateTime        @default(now())
+
+  @@unique([noteId, userId])
+  @@map("note_shares")
+}
+
+model Reminder {
+  id          String     @id @default(uuid())
+  title       String
+  description String?    @db.Text
+  remindAt    DateTime
+  repeatType  RepeatType @default(NONE)
+  isCompleted Boolean    @default(false)
+  emailSent   Boolean    @default(false)
+  isShared    Boolean    @default(false)
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  shares ReminderShare[]
+
+  @@map("reminders")
+}
+
+model ReminderShare {
+  id          String          @id @default(uuid())
+  reminderId  String
+  reminder    Reminder        @relation(fields: [reminderId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission  SharePermission @default(VIEWER)
+  createdAt   DateTime        @default(now())
+
+  @@unique([reminderId, userId])
+  @@map("reminder_shares")
+}
+
+model CalendarEvent {
+  id          String   @id @default(uuid())
+  title       String
+  description String?  @db.Text
+  startTime   DateTime
+  endTime     DateTime
+  color       String   @default("#6366f1")
+  isAllDay    Boolean  @default(false)
+  reminderMinutes Int?   // Minutes before event to send reminder (null = no reminder)
+  reminderSent    Boolean @default(false) // Track if reminder notification was sent
+  isShared    Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  shares EventShare[]
+
+  @@map("calendar_events")
+}
+
+model EventShare {
+  id         String          @id @default(uuid())
+  eventId    String
+  event      CalendarEvent   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission SharePermission @default(VIEWER)
+  createdAt  DateTime        @default(now())
+
+  @@unique([eventId, userId])
+  @@map("event_shares")
+}
+
+model Friendship {
+  id          String           @id @default(uuid())
+  requesterId String
+  requester   User             @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addresseeId String
+  addressee   User             @relation("Addressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([requesterId, addresseeId])
+  @@map("friendships")
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String?  @db.Text
+  imageUrl   String?  // Legacy field for backwards compatibility
+  isRead     Boolean  @default(false)
+  senderId   String
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  // Relations
+  attachments MessageAttachment[]
+
+  @@map("messages")
+}
+
+model MessageAttachment {
+  id        String   @id @default(uuid())
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  type      AttachmentType
+  url       String
+  fileName  String?
+  fileSize  Int?
+  mimeType  String?
+  createdAt DateTime @default(now())
+
+  @@map("message_attachments")
+}
+
+enum AttachmentType {
+  IMAGE
+  DOCUMENT
+  VIDEO
+  AUDIO
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid())
+  action      String
+  entityType  String
+  entityId    String
+  description String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@map("activity_logs")
+}
+
+model Task {
+  id          String     @id @default(uuid())
+  title       String
+  icon        String?    // Emoji icon for the task
+  status      TaskStatus @default(TODO)
+  completedAt DateTime?  // Auto-set when status changes to DONE
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("tasks")
+}

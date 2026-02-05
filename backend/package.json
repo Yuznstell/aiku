@@ -1,0 +1,40 @@
+{
+  "name": "aiku-backend",
+  "version": "1.0.0",
+  "description": "AIKU - Productivity & Collaboration Platform Backend",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:seed": "node prisma/seed.js",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.8.0",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dompurify": "^3.3.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsdom": "^27.4.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.1",
+    "sharp": "^0.34.5",
+    "socket.io": "^4.6.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "prisma": "^5.8.0",
+    "socket.io-client": "^4.8.3"
+  }
+}
